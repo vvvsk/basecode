@@ -1,0 +1,21 @@
+{
+    "files.associations": {
+        "xtr1common": "cpp",
+        "*.ipp": "cpp",
+        "format": "cpp",
+        "cctype": "cpp",
+        "clocale": "cpp",
+        "cmath": "cpp",
+        "csetjmp": "cpp",
+        "csignal": "cpp",
+        "cstdarg": "cpp",
+        "cstddef": "cpp",
+        "cstdio": "cpp",
+        "cstdlib": "cpp",
+        "cstring": "cpp",
+        "ctime": "cpp",
+        "cwchar": "cpp",
+        "cwctype": "cpp",
+        "*.def": "cpp"
+    }
+}
