@@ -1,0 +1,57 @@
+// ----------------------------------------------------------------------------
+//
+// Basecode Bootstrap Compiler
+// Copyright (C) 2018 Jeff Panici
+// All rights reserved.
+//
+// This software source file is licensed under the terms of MIT license.
+// For details, please read the LICENSE file.
+//
+// ----------------------------------------------------------------------------
+
+core :: module("../modules/core");
+
+vector3 :: struct {
+    x: f32 := 1;
+    y: f32;
+    z: f32;
+};
+
+temp :: proc() {
+    pos: vector3;
+    for i in range<u32>(0, 10) {
+        x := i * 6;
+        y := 16 * x;
+        core::print("x := %d, y:= %d\n", x, y);
+    };
+
+    pos.x := 2.0;
+    pos.y := 3.0;
+    pos.z := 11.65;
+};
+
+#run {
+    // N.B. anonymous scope to test stack
+    {
+        value: u32 := ?;
+        core::print("unassigned value := %d\n", value);
+
+        temp();
+        core::print("\n");
+
+        a: bool;
+
+        @no_fold;
+        a := 2 > 1;
+
+        @no_fold;
+        b := !a;
+
+        z: u32;
+
+        @no_fold;
+        z := (cast<u32>(16) * (2 shl 4)) * (6 + 4);
+
+        core::assert(z == 5120, "expected z == 5120");
+    };
+};

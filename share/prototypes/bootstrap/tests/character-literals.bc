@@ -1,0 +1,22 @@
+core :: module("../modules/core");
+
+a := 'A';
+b := 'b';
+
+a_type: ^type;
+a_type := type_of(a);
+b_type := type_of(b);
+
+temp: string;
+core::assign_string(address_of(temp), "hello world!", 12);
+
+#run {
+    core::print("a := %c\n", a);
+    core::print("b := %c\n", b);
+    core::print("%c\n", 'Z');
+
+    core::print("a_type.name := %s\n", a_type.name.data);
+    core::print("b_type.name := %s\n", b_type.name.data);
+
+    core::print("%s\n", temp.data);
+};

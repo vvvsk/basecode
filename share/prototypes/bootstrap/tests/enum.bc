@@ -1,0 +1,19 @@
+core :: module("../modules/core");
+
+entity_types :: enum {
+    none;
+    player;
+    ghost;
+    gorilla;
+    tank;
+    bullet;
+};
+
+#run {
+    core::print("none    := %d\n", entity_types.none);
+    core::print("player  := %d\n", entity_types.player);
+    core::print("ghost   := %d\n", entity_types.ghost);
+    core::print("gorilla := %d\n", entity_types.gorilla);
+    core::print("tank    := %d\n", entity_types.tank);
+    core::print("bullet  := %d\n", entity_types.bullet);
+};

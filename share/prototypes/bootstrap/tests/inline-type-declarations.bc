@@ -1,0 +1,25 @@
+core :: module("../modules/core");
+
+entity :: struct {
+    pos: struct {
+        x, y, z: s32;
+    };
+    cls: struct {
+        name: string;
+    };
+};
+
+adder :: proc(a, b: s32): s32 {
+    return a + b;
+};
+
+#run {
+    t: entity;
+    t.pos.x := 3;
+    t.pos.y := 4;
+    t.pos.z := -15;
+
+    core::print("t.pos.x := %d\n", t.pos.x);
+    core::print("t.pos.y := %d\n", t.pos.y);
+    core::print("t.pos.z := %d\n", t.pos.z);
+};

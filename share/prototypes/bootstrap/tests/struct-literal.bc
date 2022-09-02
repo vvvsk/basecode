@@ -1,0 +1,15 @@
+core :: module("../modules/core");
+
+player :: struct {
+    id: u32;
+    name: string;
+    x: f32 := 0.0;
+    y: f32 := 0.0;
+    lives: u8 := 3;
+};
+
+threes  := array<u8>(1, 2, 3);
+triplet := tuple(1, 2, 3);
+letters := new<map<string, u8>>("a" := 1, "b" := 2, "c" := 3);
+p1      := new<player>(id := cast<u32>(2), name := "foobar");
+

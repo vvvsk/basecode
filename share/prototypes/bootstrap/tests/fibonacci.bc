@@ -1,0 +1,87 @@
+// ----------------------------------------------------------------------------
+//
+// Basecode Bootstrap Compiler
+// Copyright (C) 2018 Jeff Panici
+// All rights reserved.
+//
+// This software source file is licensed under the terms of MIT license.
+// For details, please read the LICENSE file.
+//
+// ----------------------------------------------------------------------------
+
+core :: module("../modules/core");
+
+#run {
+    core::print("at the very top!\n");
+    alpha::compiler::examples::test();
+};
+
+alpha::compiler::config :: ns {
+    fibonacci :: ns {
+        length_of_sequence :: 1000;
+    };
+};
+
+alpha::compiler::examples :: ns {
+    import alpha::compiler::config::fibonacci;
+
+    test :: proc() {
+        count:  u32;
+        max:    u16 := 32767;
+        name:   string;
+        core::assign_string(
+            address_of(name),
+            "fibonacci test program",
+            22);
+        core::print("name.length   := %d\n", name.length);
+        core::print("name.capacity := %d\n", name.capacity);
+        core::print("name.data     := %s\n", name.data);
+
+        foo: u32 := max * 4;
+        boom := length_of_sequence;
+
+        bar_rhs_is_constant: s16 := length_of_sequence * 4;
+
+        count := 1;
+        is_this_true := count == (max == 256) && count == (max / 2);
+
+        core::print("what the hell am i doing here?\n");
+        core::print("foo := %d\n", foo);
+        core::print("boom := %d\n", boom);
+        core::print("bar_rhs_is_constant := %d\n", bar_rhs_is_constant);
+        core::print("is_this_true := %d\n", is_this_true);
+
+        bar();
+        fib_main();
+    };
+
+    bar :: proc() {
+        core::print("bing := %d\n", bing(256));
+
+        bing :: proc(z: u64): u64 {
+            if z == 0 {
+                return 0;
+            };
+            return z / 2;
+        };
+
+        return;
+    };
+
+    fib :: proc(n: u64 := 10): u64 {
+        core::print("n := %d\n", n);
+        if n == 0 || n == 1 {
+            return n;
+        } else {
+            return fib((n - 1) + fib(n - 2));
+        };
+    };
+
+    fib_main :: proc(): u32 {
+        final_fib_value := cast<u32>(fib(length_of_sequence));
+
+    'the_end:
+        return final_fib_value;
+    };
+
+};

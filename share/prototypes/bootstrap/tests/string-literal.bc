@@ -1,0 +1,12 @@
+core :: module("../modules/core");
+
+a := "hello world!\n";
+b := "\u32db\u0020\u263a\u0020\u32e1\n";
+
+j := '\u32db';
+
+#run {
+    core::print("a := %s", a);
+    core::print("b := %s", b);
+    core::print("j := %c", j);
+};

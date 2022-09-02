@@ -1,0 +1,25 @@
+// ----------------------------------------------------------------------------
+//
+// Basecode Compiler
+// Copyright (C) 2018 Jeff Panici
+// All rights reserved.
+//
+// This software source file is licensed under the terms of MIT license.
+// For details, please read the LICENSE file.
+//
+// ----------------------------------------------------------------------------
+
+// N.B. this module must be imported first so the compiler
+//      recognizes intrinsic procedures.
+intrinsics  :: module("intrinsics.bc");
+
+types       :: module("types.bc");
+maths       :: module("math.bc");
+asserts     :: module("assert.bc");
+compiler    :: module("compiler.bc");
+
+import public from maths;
+import public from types;
+import public from asserts;
+import public from compiler;
+import public from intrinsics;

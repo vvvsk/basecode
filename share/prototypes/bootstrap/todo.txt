@@ -1,0 +1,264 @@
+NOTES
+------------------------
+Steps to reach feature complete for the bootstrap compiler:
+
+- length_of intrinsic
+- clean up ast_evaluator::proc_call
+- fixed array type and subscript operator
+- family expressions
+- type-baking for generics
+- type-promotion errors for procedure_call
+- multiple/named return parameters
+- lambdas
+- UFCS
+- consolidate errors/return errors from all appropriate locations
+
+After these tasks are complete (most are covered below) then the assembler should be enhanced to
+support variable directives and label operators.
+
+Code generation rewrite to move away from emit/on_emit and do everything in a byte_code_emitter for
+better state management and locality.  We need some new structures here:
+    - element needs to be somehow linked to a "unit" or "section" in the assembler and this construct
+      contains the related instruction_block instances;
+    - this should allow for easy regeneration of a particular element and its children because we
+      know what that is on the assembler side of things;
+
+Refactor session:
+    - need to introduce a general job system (not necessarily multi-threaded)
+    - the work that session does should be broken into jobs
+    - jobs can depend on other jobs
+    - session should track "versions" of the code DOM:
+        - associated assembler constructs ("units"/"sections" and their instruction_blocks)
+        - source representation
+        - changes to debugger to support "compile type" debugging so we can see the
+            different versions as the meta-program makes changes and "runtime" where
+            things are now fixed and we're doing classical debugging.
+
+Compiler:
+    - Expose structures and API for meta-programming
+    - Add an event callback system where the Basecode meta-program can pass a pointer to a procedure
+      and receive callbacks when the compiler does something, e.g. parse a statement, translate a statement
+      to the compiler DOM, etc.
+    - Need to track changes to the DOM (set of pointers to element) and when a meta-program phase finishes
+      the compiler needs to version the DOM by regenerating new code.  This cycle repeats until
+      no more meta-programs need to run.
+
+Enhance the built-in debugger to support source-level debugging in addition to byte-code.
+
+IDEAS
+---------
+- What would native co-routines look like?
+    yield {expression};
+    mark proc as co
+    stack frame management
+
+QUESTIONS
+---------
+- Do we want to make type_reference's aliases match the bound identifier's
+  symbol?
+
+  See ~line 607 in ast_evaluator for note:
+    - BUG: tuple.bc -- the type_reference's symbol isn't being updated to match
+            the constant identifier's symbol.
+
+WORKING
+-------
+- NEW: length_of intrinsic for literal strings and fixed arrays
+
+- NEW: fixed length arrays; subscript operator
+
+- NEW: family expressions
+        integers :: family(signed_integers, unsigned_integers);
+        signed_integers :: family(s8, s16, s32, s64);
+        unsigned_integers :: family(u8, u16, u32, u64);
+
+        only_signed_adder :: proc<T:signed_integers>(x: T, y: T): T {
+            return x + y;
+        };
+
+- NEW: convert multiple/named parameters in procedure return into a tuple
+
+TASKS
+-----
+- NEW: consolidate all errors into one class along with constants for quick lookup.
+- NEW: finish terp::jump_to_subroutine
+
+- NEW: for_element stack frame support
+
+- NEW: implement procedure instance baking
+- NEW: struct/union instance baking
+
+- NEW: UFCS
+
+- NEW: DFA graph coloring
+
+- BUG: multiple assignment code generation doesn't allow for value swaps.
+- BUG: placeholder identifier "_" isn't working properly
+- BUG: redefining an identifier with another type doesn't give nice errors.
+
+- BUG: rework ast_evaluator::proc_call to clean up the various types of "procedure"
+
+- BUG: fix utf8 streaming issues in lexer/source_file
+- BUG: add missing errors
+- BUG: fix location for elements
+
+- BUG: lambda procedure type checking
+- BUG: type parameter propagation
+
+- REFACTOR: session/variable combination, again
+            merge concept of register_allocator + variable
+            DFA graph coloring
+- REFACTOR: ast_evaluator::add_identifier_to_scope
+
+DONE
+----
+- implement namespaces in the parser
+- implement enumerations in lexer/parser
+- implement object/pointer dereference with . operator
+- fix precedence of @attribute in parser
+- implement defer in parser (executed in reverse order)``
+- implement with in parser
+- ast to internal model
+- what is the type of a function?
+- remove scope, symbol_table, constant_expression_evaluator, type_inference_engine
+- boolean_literal
+- procedure subclass for type
+- type needs to include type parameters
+- require return statement
+    * multiple return values
+- does binary_operator/unary_operator need element* or just expression*
+- base types should be statically defined in program
+- comment
+- implement block comments /* */ in the lexer/parser
+- determine the best way to create new elements
+    * maybe follow a similar pattern to ast_builder
+- string_literal
+- labels
+- alias
+- cast
+- return
+- if/else if/else
+- FIX: comma token is being gobbled up during infix parsing
+- identifier/namespace handling
+- create parameter identifiers in block
+- review: procedure calls
+- type inference
+- need to work out how proc types should work
+- are the compiler directives bootstrapped using the @directive attribute so
+  therefore all implemented in Basecode?
+- type inference:
+    * add function on program that recursively attempts to finalize
+        type inference for identifiers after compile finishes.
+- ffi:
+    * directive (#foreign) should register procedure_type with vm::terp
+    * attribute for library module specific, e.g. @library "libfoo.so", etc.
+    * refactor project structure:
+        1. core compiler should be shared library
+        2. bac command-line tool should be executable target
+- data definitions
+    * compiler::type needs a size and composite_type needs to compute size based on fields
+    * MOVE: as_string() to element and add as_integer(), as_float(), as_bool()
+    * compiler::string_type, compiler::array_type, compiler::any_type should
+      inherit from compiler::composite_type and initialize should
+      set up their fields.
+    * string interning
+    * encode constant parameters
+- FIX: graph generator is not escaping quotes
+- use initializer to handle custom construction of values?
+- basic block:
+    * emit actual instructions for block behavior
+    * local variables/parameters on stack
+        * how do blocks link to one another in sequence?
+- assignment needs to check is_constant on the rhs to determine if
+  a bin_op assignment is needed or if the value can be expressed directly
+- assembler:
+    * need to build out the api here
+- add support to compiler:
+    * module(expr) instead of #load
+    * namespace importing
+        - import <expr> [from <identifier>]
+- FIX: now that boost is available, get the executable full path
+- FIX: pass executable path into session so paths for module files can be full paths
+- FIX: the AST node graph output option shouldn't take a filename now.  the filename should
+        be based on the module compiled.  the option should just be a flag.
+- NEW: add command line flags that are passed into the compiler as definitions
+- consolidate array_constructor and tuple, map, and struct/union/enum into type_literal
+- create_type_identifier needs an overhaul:
+    * parsing of pointer types and spreads needs to utilize the prefix parsing
+    * parsing of array subscripts needs to be folded into the existing subscript parser
+    * specification of a dynamic array [] needs to do something other an generate a fake spread_type
+    * ast_node_t flags should be removed from array, pointer, spread_type
+- proc_call needs to support generic parameters:
+    * ast_evaluator should compare parameters to procedure_type and raise
+      errors if they don't match.
+- intrinsic needs to support generic parameters, e.g. for use with range<T>(..)
+- new<type<>> needs to support generic parameters for the embedded type
+- BUG: comma precedence needs to be revisited now that everything is vectoring through proc_call_infix_parser.
+- byte code emit for: switch, case, fallthrough
+- byte code emit: for_element
+- BUG: identifiers not found are returning a type inference error instead.
+- REFACTOR: variable to improve how walk_to_root_and_calculate_offset is used.
+- BUG: procedure_type is not allocating space on stack for locals
+       also: need to emit initializers for locals
+- BUG: variable lookup isn't seeing locals as stack things
+- BUG: variable offset management for stack + structs is a mess
+- BUG: procedure_type, procedure_call need lots of love:
+    * return_element
+    * procedure_call
+    * argument_list
+- BUG: enum type creation needs to automatically type fields and increment value.
+- REVIEW: type check should enforce scalar/composite type rules.
+- BUG: syntax like: support: print("hello!"); causes the compiler to end silently.
+- REFACTOR: rework stack_frame (move to compiler)
+            refactor procedure_type & procedure_instance to utilize stack_frame
+            stack_frame instance should live off compiler::block
+- REFACTOR: remove unnecessary block types from element_type_t
+- NEW: anonymous block stack frame support
+- NEW: uninitialized operator
+- BUG: FFI stack frame requires additional data to work
+- BUG: the unary_operator constant evaluator should take
+       the size of the integer value into account and narrow to that size (constant-folding.bc)
+- BUG: composite_type offsets incorrect within stack frame.
+- NEW: implement the #run directive
+       remove the automatic execution of code during compilation and replace with #run
+- BUG: reintroduce dcArgStruct in ffi
+- BUG: passing a string by-value on stack isn't working
+        need to clean up large stack allocations after JSR
+- REFACTOR: assembly_label needs to be broken into at least three subclasses
+- REFACTOR: assembler::assemble_from_source should take a result-like object
+            which has a pointer to the new instruction_block it creates.
+- NEW: implement mechanism to identify the type of symbol for inline assembly, e.g.
+        local(foo)  (local variable on the stack frame, would return offset)
+        module(foo) (module variable in the image/on the heap, would return address)
+        label(foo)  (a basecode label reference, would return address)
+        foo         (an assembler identifier only, would return address)
+
+        .ilocal {alias}  ; allocates an integer register
+        .flocal {alias}  ; allocates a float register
+- NEW: add terp trap for putc/getc for any file handle
+- BUG: proc_expression needs to support overloaded procedures
+- BUG: struct should conform to C ABI for padding/alignment
+- BUG: finish union (ensure proper padding/alignment)
+- BUG: I added a partial whitelisting approach to the terp for foreign addresses.
+       For completeness, the terp needs to whitelist and moves, adds, subtracts to
+       source values that are in the whitelist.
+- BUG: structures aren't being padded to match what C/C++ are expecting.
+        __attribute__((packed)) does allow C/C++ to align with our structures.
+- BUG: unary_operator case not implemented in session::type_check
+- BUG: ordering issues between types; requires deferred type checking
+        (see ast_evaluator::binary_operator)
+- BUG: don't recreate modules, just point references at them.  probably need to
+        base this on the file name/path of the module.
+- BUG: inline type declarations aren't working in ast_evaluator::type_declaration
+- NEW: add support for consolidated field/parameter declarations, e.g.
+
+    vector3 :: struct {
+        x, y, z: f32;
+    };
+
+    or
+
+    adder :: proc(a, b: s32): s32 {
+        return a + b;
+    };
+- NEW: string literal parsing and escapes

@@ -1,0 +1,28 @@
+core :: module("../modules/core");
+
+#run {
+    a: string;
+    core::assign_string(address_of(a), "hello world\n", 12);
+    core::print("%s\n", a.data);
+
+    PI :: cast<f64>(3.1415926535);
+    E  :: cast<f64>(2.7182818284);
+
+    E2 := ((E * cast<f64>(3)) + cast<f64>(1.105)) / cast<f64>(2.0);
+
+    id_t :: #type u8;
+    foo: id_t;
+    bar: s16 := 8;
+    foo := cast<id_t>(bar);
+
+    speed_t    :: #type f32;
+    distance_t :: #type f32;
+
+    s: speed_t := 1.25;
+    d: distance_t := 5.12;
+
+    delta := s * d;
+
+    core::print("PI := %f\n", PI);
+    core::print("E  := %f\n", E);
+};

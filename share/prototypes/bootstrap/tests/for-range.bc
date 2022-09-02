@@ -1,0 +1,32 @@
+core :: module("../modules/core");
+
+test :: proc() {
+    core::print("\n1\n");
+    for x in range<s32>(0, 10, 2) {
+        core::print("x := %d\n", x);
+    };
+
+    core::print("\n2\n");
+    for x in range<s32>(dir := core::ranges::orders::REVERSE, 10, kind := core::ranges::kinds::EXCLUSIVE, 0, 1) {
+        core::print("x := %d\n", x);
+    };
+
+    core::print("\n3\n");
+    for x in range<s32>(20, 0, dir := core::ranges::orders::REVERSE) {
+        core::print("x := %d\n", x);
+    };
+
+    core::print("\n4\n");
+    for x in range<s32>(20, 10, 3, dir := core::ranges::orders::REVERSE) {
+        core::print("x := %d\n", x);
+    };
+};
+
+#run {
+    test();
+
+//    print("\n5\n");
+//    for x in range<s32>(0, 30, 5) {
+//        print("x := %d\n", x);
+//    };
+};

@@ -1,0 +1,14 @@
+core :: module("../modules/core");
+
+COMPARATOR :: proc<K>(lhs: ^K, rhs: ^K):bool;
+
+// XXX: need to enhance type resolution for aliases to pass type parameters
+qsort :: proc<T>(
+        items: ^[]T,
+        comparator: COMPARATOR) {
+    // stuff
+};
+
+values := array<u32>(16, 3, 5, 110, 4, 3, 9, 19, 21);
+
+#run qsort(address_of(values), |lhs: ^u32, rhs: ^u32| lhs^ < rhs^);

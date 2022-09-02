@@ -1,0 +1,24 @@
+core :: module("../modules/core");
+
+#run {
+    x := 1;
+
+    switch x {
+        case 0 => {
+            core::print("0\n");
+        };
+
+        case 1 => {
+            core::print("1\n");
+        };
+
+        case 2 => {
+            core::print("2\n");
+            fallthrough;
+        };
+
+        case => {
+            core::print("default\n");
+        };
+    };
+};

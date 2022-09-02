@@ -1,0 +1,31 @@
+// ----------------------------------------------------------------------------
+//
+// Basecode Compiler
+// Copyright (C) 2018 Jeff Panici
+// All rights reserved.
+//
+// This software source file is licensed under the terms of MIT license.
+// For details, please read the LICENSE file.
+//
+// ----------------------------------------------------------------------------
+
+public :: ns {
+
+    exit   :: proc(level: s32) {
+        #assembly {{
+            .ilocal     temp1
+            load.dw     temp1, level
+            push.dw     temp1
+            jmp.qw      _finalizer
+        }};
+    };
+
+    assert :: proc(predicate: bool, message: ^u8) {
+        if predicate {
+            return;
+        };
+        print("assertion failure: %s\n", message);
+        exit(1);
+    };
+
+};

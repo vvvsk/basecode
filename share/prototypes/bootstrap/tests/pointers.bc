@@ -1,0 +1,31 @@
+core :: module("../modules/core");
+
+ARRAY_WIDTH  :: 4;
+ARRAY_HEIGHT :: 4;
+
+n: s32;
+p: ^u8;
+j: []u8;
+k: [ARRAY_HEIGHT][ARRAY_WIDTH]s16;
+q: ^[]string;
+z: ^[]^[]^u64;
+
+item :: struct {
+    n: s32;
+};
+
+id_t           :: #type u32;
+item_ptr_t     :: #type ^item;
+item_ptr_ptr_t :: #type ^^item;
+
+items: ^item_ptr_t;
+foo := items^;
+
+#run {
+    // alloc & free block of memory
+    'allocate_memory:
+    addr: ^u8;
+    addr := alloc(size_of(u16) * 4096);
+    core::print("addr := $%08x\n", addr);
+    free(addr);
+};

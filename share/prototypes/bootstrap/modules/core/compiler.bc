@@ -1,0 +1,51 @@
+// ----------------------------------------------------------------------------
+//
+// Basecode Compiler
+// Copyright (C) 2018 Jeff Panici
+// All rights reserved.
+//
+// This software source file is licensed under the terms of MIT license.
+// For details, please read the LICENSE file.
+//
+// ----------------------------------------------------------------------------
+
+public :: ns {
+
+    traps :: ns {
+        putc :: $01;
+        getc :: $02;
+    };
+
+    putc :: proc(char: rune, f: u32 := 1) {
+        #assembly {{
+            .ilocal     temp1
+            .ilocal     temp2
+
+            load.dw     temp1, f
+            load.dw     temp2, char
+            push.dw     temp2
+            push.dw     temp1
+            trap.b      module(traps::putc)
+        }};
+    };
+
+    getc :: proc(f: u32 := 1): rune {
+        result: rune;
+        #assembly {{
+            .ilocal     temp1
+
+            load.dw     temp1, f
+            push.dw     temp1
+            trap.b      module(traps::getc)
+            pop.dw      temp1
+            store.dw    result, temp1
+        }};
+        return result;
+    };
+
+    @library "basecode";
+    #foreign {
+        print :: proc(format: ^u8, ...values: any) @alias "fmt_print";
+    } @parent_scope;
+
+};

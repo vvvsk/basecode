@@ -1,0 +1,41 @@
+core :: module("../modules/core");
+
+#run {
+    msg: string;
+    core::assign_string(address_of(msg), "hello world", 11);
+
+    temp: string;
+    temp := msg;
+
+    with temp {
+        core::print("temp.length   := %d\n", .length);
+        core::print("temp.capacity := %d\n", .capacity);
+    };
+
+    one :: struct {
+        a: two;
+    };
+
+    two :: struct {
+        b: three;
+    };
+
+    three :: struct {
+        c: string;
+    };
+
+    x: one;
+
+    with x {
+        with .a {
+            with .b {
+                .c := msg;
+                with .c {
+                    core::print(".length   := %d\n", .length);
+                    core::print(".capacity := %d\n", .capacity);
+                    core::print(".data     := '%s'\n", .data);
+                };
+            };
+        };
+    };
+};
